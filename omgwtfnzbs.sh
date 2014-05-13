@@ -4,7 +4,7 @@
    nzb_directory="scr/moviesd"
    tempfile="/tmp/omgwtfnzbs.org.nzb-upload.parser"
 
-   if [[ ! -f $cookiedata ]]; then
+   if [[ ! -f "$cookiedata" ]]; then
       echo ""
       echo "Error: cookie file not set!"
       echo ""
@@ -19,7 +19,7 @@
 
     else
 
-    cd $nzb_directory
+    cd "$nzb_directory"
 
     for nzbfile in *.nzb; do
 
