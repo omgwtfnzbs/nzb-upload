@@ -1,6 +1,8 @@
 nzb-upload
 ==========
 
+As root: <br><br>
+
 apt-get install curl<br>
 git clone https://github.com/omgwtfnzbs/nzb-upload.git <br>
 cd nzb-upload/<br>
