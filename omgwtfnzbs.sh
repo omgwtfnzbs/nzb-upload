@@ -1,31 +1,45 @@
 #!/bin/bash
 
-   cookiedata="omg.cookie";
-   nzb_directory="scr/moviesd"
-   tempfile="/tmp/omgwtfnzbs.org.nzb-upload.parser"
+   cookie_file_location=$1
+   category=$2
+   nzb_file=$3
 
-   if [[ ! -f "$cookiedata" ]]; then
+   #optional
+   nfo_file=$4
+
+   if [[ ! -f "$cookie_file_location" ]]; then
+
       echo ""
-      echo "Error: cookie file not set!"
+      echo "Error: cookie information not set!"
       echo ""
       exit
+
    fi
 
-   if [ ! -d "$nzb_directory" ]; then
+   arr=(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34)
+
+   if [[ ! ${arr[*]} =~ "$category" ]]; then
+
       echo ""
-      echo "Error: nzb_directory does not exist!"
+      echo "Error: invalid category number"
+      echo ""
+      exit
+
+   fi
+
+   if [ ! -f "$nzb_file" ]; then
+
+      echo ""
+      echo "Error: nzb file does not exist!"
       echo ""
       exit
 
     else
 
-    cd "$nzb_directory"
+    tempfile="/tmp/omgwtfnzbs.org.nzb-upload.parser.tmp"
 
-    for nzbfile in *.nzb; do
-
-    [[ -d "$nzbfile" ]] || 
-
-    release="${nzbfile%.nzb}" 
+    minus_path="${nzb_file##*/}"
+    release="${minus_path%.nzb}" 
     string=${release,,}
 
     if [[ "$string" =~ (.pal.) ]]; then
@@ -62,30 +76,24 @@
       language="0"
     fi
 
-    nfofile=$(find "$(pwd)" -name "$release.nfo")
+    
     release=$(echo "$release" | xargs)
+    curl=$(which curl)
 
-    if [ "$nfofile" != "" ]; then
+    if [[ -f "$nfo_file" ]]; then
 
-    /usr/bin/curl -s -k -b "$cookiedata" -F "rlsname=$release" -F "catid=15" -F "mats=$format" -F "language=$language" -F "nzb=@$nzbfile" -F "nfo=@$nfofile" -F "upload=upload" https://omgwtfnzbs.org/nzb-upload.php --location > $tempfile
-    response=$(cat $tempfile | grep -o '<response>.*</response>' | sed -e 's/<[^>]*>//g')
-
-    rm "$nfofile" > /dev/null 2>&1
-    rm "$nzbfile" > /dev/null 2>&1
+      $curl -s -k -b "$cookie_file_location" -F "rlsname=$release" -F "catid=$category" -F "mats=$format" -F "language=$language" -F "nzb=@$nzb_file" -F "nfo=@$nfo_file" -F "upload=upload" https://omgwtfnzbs.org/nzb-upload.php --location > $tempfile
+      response=$(cat $tempfile | grep -o '<response>.*</response>' | sed -e 's/<[^>]*>//g')
 
     else 
 
-    /usr/bin/curl -s -k -b "$cookiedata" -F "rlsname=$release" -F "catid=15" -F "mats=$format" -F "language=$language" -F "nzb=@$nzbfile" -F "upload=upload" https://omgwtfnzbs.org/nzb-upload.php --location > $tempfile
-    response=$(cat $tempfile | grep -o '<response>.*</response>' | sed -e 's/<[^>]*>//g')
-
-    rm "$nzbfile" > /dev/null 2>&1
+      $curl -s -k -b "$cookie_file_location" -F "rlsname=$release" -F "catid=$category" -F "mats=$format" -F "language=$language" -F "nzb=@$nzb_file" -F "upload=upload" https://omgwtfnzbs.org/nzb-upload.php --location > $tempfile
+      response=$(cat $tempfile | grep -o '<response>.*</response>' | sed -e 's/<[^>]*>//g')
     
     fi
 
-    echo $response
-
-    sleep 0.05;
-
-    done
+      echo ""
+      echo $response
+      echo ""
 
     fi
